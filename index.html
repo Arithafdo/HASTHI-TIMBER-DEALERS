@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
+  %22name%22: %22Hasthi Furniture%22,
+  %22short_name%22: %22Hasthi%22,
+  %22start_url%22: %22./%22,
+  %22display%22: %22standalone%22,
+  %22background_color%22: %22%23ffffff%22,
+  %22theme_color%22: %22%230f172a%22
+}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasthi Furniture Billing System</title>
+    <!-- jsPDF Library for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; color: #1e293b; }
+        .container { max-width: 650px; margin: auto; background: white; padding: 15px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+        
+        .brand-logo-container {
+            text-align: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .brand-logo-img {
+            max-width: 160px;
+            height: auto;
+            display: inline-block;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+        .upload-logo-btn {
+            background-color: #475569;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 2px;
+            display: inline-block;
+        }
+        .upload-logo-btn:hover { background-color: #334155; }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: #64748b;
+            margin: 4px 0 0 0;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+        }
+
+        h2 { text-align: center; color: #0f172a; margin: 5px 0 10px 0; font-size: 18px; font-weight: 700; }
+        .form-group { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 3px; font-weight: bold; font-size: 13px; color: #334155; }
+        input, select { width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus { border-color: #d97706; }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .row { display: flex; gap: 8px; }
+        .col { flex: 1; }
+        button { background-color: #0f172a; color: white; border: none; padding: 9px; width: 100%; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: bold; margin-top: 8px; transition: all 0.2s ease; }
+        button:hover { background-color: #1e293b; }
+        
+        .print-btn { background-color: #0284c7; }
+        .print-btn:hover { background-color: #0369a1; }
+        .download-btn { background-color: #0d9488; }
+        .download-btn:hover { background-color: #0f766e; }
+        .share-btn { background-color: #d97706; }
+        .share-btn:hover { background-color: #b45309; }
+        .finish-btn { background-color: #16a34a; }
+        .finish-btn:hover { background-color: #15803d; }
+        .cancel-btn { background-color: #dc2626; }
+        .cancel-btn:hover { background-color: #b91c1c; }
+        
+        .delete-btn { background-color: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .delete-btn:hover { background-color: #b91c1c; }
+        .edit-btn { background-color: #d97706; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; margin-right: 4px; font-size: 12px; }
+        .edit-btn:hover { background-color: #b45309; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        table, th, td { border: 1px solid #e2e8f0; }
+        th, td { padding: 6px; text-align: center; }
+        th { background-color: #f8fafc; color: #1e293b; }
+        
+        #homeScreen { text-align: center; padding: 25px 10px; display: block; }
+        
+        /* Ultra Luxury Minimalist & Gold Accent Home Buttons Style */
+        .home-menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-width: 420px;
+            margin: 20px auto 0 auto;
+        }
+        .mode-btn {
+            background: linear-gradient(135deg, #182232 0%, #0d131f 100%);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 16px 20px;
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid #334155;
+            box-shadow: 0 8px 20px rgba(13, 19, 31, 0.15);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .mode-btn::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            height: 100%;
+            background: #d97706;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+        .mode-btn:hover::after {
+            width: 7px;
+            opacity: 1;
+        }
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(217, 119, 6, 0.2);
+            border-color: #d97706;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+        .mode-btn .icon-box {
+            background: rgba(217, 119, 6, 0.12);
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #d97706;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .mode-btn:hover .icon-box {
+            background: rgba(217, 119, 6, 0.25);
+            transform: scale(1.08) rotate(3deg);
+        }
+        .mode-btn .text-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+        .mode-btn .btn-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f8fafc;
+            letter-spacing: 0.3px;
+        }
+        .mode-btn .btn-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-top: 3px;
+        }
+
+        .mode-btn.sell-mode {
+            background: linear-gradient(135deg, #202c3d 0%, #111823 100%);
+        }
+        .mode-btn.history-mode {
+            background: linear-gradient(135deg, #2a3749 0%, #16202c 100%);
+        }
+
+        #appScreen, #historyScreen, #invoiceView { display: none; }
+        .back-link { cursor: pointer; color: #0284c7; font-weight: bold; margin-bottom: 10px; display: inline-block; font-size: 13px; }
+        .back-link:hover { color: #0369a1; text-decoration: underline; }
+        .category-summary-card { background: #fdfefe; border: 1px solid #cbd5e1; padding: 10px; margin-top: 8px; border-radius: 8px; }
+        .history-card { background: #fff; border: 1px solid #cbd5e1; padding: 12px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+        @media print {
+            body { background-color: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; border: none; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="billContainer">
+    <!-- Brand Logo Section -->
+    <div class="brand-logo-container">
+        <img id="brandLogoImage" src="IMG_5829 bg.jpg" alt="Hasthi Furniture Logo" class="brand-logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'160\' height=\'60\'><text x=\'10\' y=\'35\' font-family=\'sans-serif\' font-size=\'16\' font-weight=\'bold\' fill=\'%232c3e50\'>HASTHI FURNITURE</text></svg>';">
+        <br>
+        <input type="file" id="logoUploadInput" accept="image/*" style="display: none;" onchange="loadLogoFromGallery(event)">
+        <button class="upload-logo-btn no-print" onclick="document.getElementById('logoUploadInput').click()">🖼️ Change Logo</button>
+        
+        <p class="brand-subtitle">Authorized Timber & Furniture Solutions</p>
+    </div>
+
+    <!-- Home Screen -->
+    <div id="homeScreen" class="no-print">
+        <h2>Select System Mode</h2>
+        <div class="home-menu-container">
+            <button class="mode-btn" onclick="selectMode('Buy')">
+                <div class="icon-box">🛒</div>
+                <div class="text-box">
+                    <span class="btn-title">Purchase (Buy - BL)</span>
+                    <span class="btn-desc">Record incoming timber logs and suppliers</span>
+                </div>
+            </button>
+            
+            <button class="mode-btn sell-mode" onclick="selectMode('Sell')">
+                <div class="icon-box">📦</div>
+                <div class="text-box">
+                    <span class="btn-title">Sales (Sell - SL)</span>
+                    <span class="btn-desc">Create customer invoices & timber orders</span>
+                </div>
+            </button>
+            
+            <button class="mode-btn history-mode" onclick="openHistory()">
+                <div class="icon-box">📊</div>
+                <div class="text-box">
+                    <span class="btn-title">Saved Bills History</span>
+                    <span class="btn-desc">View, manage and review past invoices</span>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- History Screen -->
+    <div id="historyScreen" class="no-print">
+        <span class="back-link" onclick="goHome()">⬅ Back</span>
+        <h2>Saved Bills History</h2>
+        <div id="historyListContainer">
+            <p style="text-align: center; color: #666;">No saved bills found.</p>
+        </div>
+    </div>
+
+    <!-- App Screen -->
+    <div id="appScreen" class="no-print">
+        <span class="back-link" onclick="cancelDraft()">⬅ Cancel / Back</span>
+        <h2 id="screenTitle">Hasthi Billing</h2>
+        
+        <!-- Manual Bill Number Input -->
+        <div class="form-group" style="background: #f8fafc; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1;">
+            <label style="color: #475569; font-size: 12px;">Bill Number:</label>
+            <input type="text" id="billNumberInput" class="nav-input" placeholder="BL-1001 or SL-1001" style="background: #fff; font-weight: bold;" oninput="autoSaveDraft(); updateNameDisplay();">
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label id="nameLabel">Customer / Supplier Name:</label>
+                    <input type="text" id="custName" class="nav-input" placeholder="Enter name" oninput="autoSaveDraft(); updateNameDisplay();">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="billDate" class="nav-input" onchange="autoSaveDraft(); updateNameDisplay();">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Timber Type:</label>
+            <select id="timberTypeSelect" class="nav-input" onchange="checkTimberOptions(); autoSaveDraft();">
+                <option value="" disabled selected>-- Select Timber Type --</option>
+                <option value="Teak">Teak</option>
+                <option value="Mahogany">Mahogany</option>
+                <option value="Alstoniya">Alstoniya</option>
+                <option value="Jack">Jack</option>
+                <option value="Sapu">Sapu</option>
+                <option value="Nadun Normal">Nadun Normal</option>
+                <option value="Nadun Special">Nadun Special (18"-35")</option>
+                <option value="Others">Others</option>
+            </select>
+        </div>
+
+        <!-- Others Option Textbox -->
+        <div class="form-group" id="otherTimberGroup" style="display: none;">
+            <label>Specify Other Timber Type:</label>
+            <input type="text" id="otherTimberInput" class="nav-input" placeholder="Type timber name here" oninput="autoSaveDraft()">
+        </div>
+
+        <!-- Nadun Special General Rate Textbox -->
+        <div class="form-group" id="nadunRateGroup" style="display: none; background: #fffbeb; padding: 8px; border-radius: 8px; border: 1px solid #fde68a;">
+            <label style="color: #92400e; font-size: 13px;">Nadun Special General Inch Rate (LKR) (18"-35"):</label>
+            <input type="number" id="nadunRateInput" class="nav-input" placeholder="Ex: 150" style="background: #fff;" oninput="autoSaveDraft()">
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label>Length (in Feet):</label>
+                    <input type="number" id="length" class="nav-input" placeholder="Ex: 15">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label>Circumference (in Inches):</label>
+                    <input type="number" id="circ" class="nav-input" placeholder="Ex: 38">
+                </div>
+            </div>
+        </div>
+
+        <!-- Free Item Checkbox (Only visible in Sell Mode) -->
+        <div class="form-group" id="freeItemCheckboxGroup" style="display: none; background: #f0fdf4; padding: 8px; border-radius: 8px; border: 1px solid #bbf7d0;">
+            <label style="display: flex; align-items: center; cursor: pointer; color: #166534; font-size: 13px; font-weight: bold; margin: 0;">
+                <input type="checkbox" id="isFreeItem" style="width: 16px; height: 16px; margin-right: 8px;"> 🎁 Mark as Free Item (No Charge)
+            </label>
+        </div>
+
+        <button id="actionBtn" onclick="addItem()" style="background-color: #16a34a;">Add Item to List</button>
+
+        <h3 id="billTitleDisplay" style="margin-bottom: 5px; font-size: 14px; margin-top: 12px; color: #1e293b;">Summary:</h3>
+        
+        <!-- Items Table -->
+        <table id="billTable">
+            <thead>
+                <tr>
+                    <th>Timber Type</th>
+                    <th>Measurements (L x C)</th>
+                    <th>Size Category</th>
+                    <th>PDF Measurement Breakdown / Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data inserted here -->
+            </tbody>
+        </table>
+
+        <!-- Timber & Category Wise Totals & Rates Section -->
+        <div id="categorySummarySection" style="margin-top: 12px; display: none;">
+            <h4 style="margin: 0 0 6px 0; color: #1e293b; font-size: 14px;">Timber Categories & Rates (LKR):</h4>
+            <div id="categorySummaryCards"></div>
+        </div>
+
+        <!-- Workers Rental Section (Only for Sell Mode) -->
+        <div id="workersRentalSection" style="display: none; margin-top: 15px; background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px;">
+            <label style="display: flex; align-items: center; cursor: pointer; color: #1e293b; font-size: 14px; font-weight: bold;">
+                <input type="checkbox" id="enableWorkersRental" style="width: 18px; height: 18px; margin-right: 8px;" onchange="toggleWorkersRentalInputs()"> Include Workers Rental
+            </label>
+            
+            <div id="workersRentalFields" style="display: none; margin-top: 10px; border-top: 1px dashed #cbd5e1; padding-top: 8px;">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label style="font-size: 12px;">Cubic Feet (Cu.Ft):</label>
+                            <input type="number" step="any" id="workersRentalCuft" class="nav-input" placeholder="Cu.Ft" oninput="calculateWorkersRentalTotal(); autoSaveDraft();">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label style="font-size: 12px;">Rate (LKR per Cu.Ft):</label>
+                            <input type="number" id="workersRentalRate" class="nav-input" placeholder="Rate" oninput="calculateWorkersRentalTotal(); autoSaveDraft();">
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size: 13px; font-weight: bold; color: #0d9488; text-align: right; margin-top: 4px;" id="workersRentalDisplayAmt">
+                    Workers Rental Total: LKR 0.00
+                </div>
+            </div>
+        </div>
+
+        <!-- Finish & Cancel Buttons -->
+        <div class="row" style="margin-top: 15px;">
+            <div class="col">
+                <button class="finish-btn" onclick="finishBill()">✅ Finish & Generate Bill</button>
+            </div>
+            <div class="col">
+                <button class="cancel-btn" onclick="cancelDraft()">❌ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Invoice View Screen -->
+    <div id="invoiceView">
+        <span class="back-link no-print" onclick="backToEditFromInvoice()">⬅ Back to Edit Bill</span>
+        <h3 id="invoiceHeaderInfo" style="text-align: center; font-size: 14px; color: #334155; margin: 10px 0;"></h3>
+        
+        <h4 style="margin: 8px 0 4px 0; font-size: 13px; color: #1e293b;">Timber Details:</h4>
+        <table id="invoiceTable">
+            <thead>
+                <tr>
+                    <th>Timber Type & Size Category</th>
+                    <th>Total Cubic Feet (Cu.Ft)</th>
+                    <th>Rate (LKR)</th>
+                    <th>Total Amount (LKR)</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceTableBody">
+            </tbody>
+        </table>
+
+        <!-- Free Items Summary Box in Invoice -->
+        <div id="invoiceFreeItemsContainer" style="display: none; margin-top: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 8px;">
+            <h4 style="margin: 0 0 4px 0; font-size: 13px; color: #166534;">🎁 Free Timber Summary:</h4>
+            <div id="invoiceFreeItemsList" style="font-size: 12px; color: #15803d; margin-bottom: 4px;"></div>
+            <div style="font-size: 13px; font-weight: bold; color: #166534;" id="invoiceTotalFreeCuftDisplay">
+                Total Free Given Cubic Feet: 0.00 cu.ft
+            </div>
+        </div>
+
+        <!-- Invoice Workers Rental Table (If enabled) -->
+        <div id="invoiceWorkersContainer" style="display: none; margin-top: 12px;">
+            <h4 style="margin: 8px 0 4px 0; font-size: 13px; color: #1e293b;">Workers Rental:</h4>
+            <table id="invoiceWorkersTable">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Cubic Feet (Cu.Ft)</th>
+                        <th>Rate (LKR)</th>
+                        <th>Total Amount (LKR)</th>
+                    </tr>
+                </thead>
+                <tbody id="invoiceWorkersTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Action Buttons after finish -->
+        <div class="row no-print" style="margin-top: 20px;">
+            <div class="col">
+                <button class="download-btn" onclick="downloadPDF()">📥 Download PDF</button>
+            </div>
+            <div class="col">
+                <button class="print-btn" onclick="printBill()">🖨️ Print</button>
+            </div>
+            <div class="col">
+                <button class="back-link" style="background: #64748b; color: white; padding: 10px; border-radius: 8px; text-align: center; display: block; text-decoration: none;" onclick="goHome()">🏠 New Bill</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let items = [];
+    let currentMode = '';
+    let editingIndex = null;
+
+    const categoryRankOrder = [
+        '< 18" (Under 18 inches)',
+        '18" - 35" (Nadun Special Formula)',
+        '< 24" (Under 24 inches)',
+        '24" - 29"',
+        '30" - 35"',
+        '36" - 47"',
+        '48" - 59"',
+        '> 60" (Over 60 inches)'
+    ];
+
+    function getCategoryRank(catName) {
+        let idx = categoryRankOrder.indexOf(catName);
+        if (idx !== -1) return idx;
+        return 99;
+    }
+
+    window.onload = function() {
+        let savedDraft = localStorage.getItem('hasthi_active_draft');
+        if (savedDraft) {
+            try {
+                let draftData = JSON.parse(savedDraft);
+                let draftTime = draftData.time || 0;
+                if ((Date.now() - draftTime) < (24 * 60 * 60 * 1000)) {
+                    if (confirm("Unsaved draft billing data found. Would you like to restore it?")) {
+                        restoreDraft(draftData);
+                        setupEnterKeyNavigation();
+                        return;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        let today = new Date().toISOString().split('T')[0];
+        document.getElementById('billDate').value = today;
+        
+        let savedLogo = localStorage.getItem('hasthi_logo_img');
+        if (savedLogo) {
+            document.getElementById('brandLogoImage').src = savedLogo;
+        }
+        setupEnterKeyNavigation();
+    }
+
+    function setupEnterKeyNavigation() {
+        const inputs = document.querySelectorAll('.nav-input');
+        inputs.forEach((input) => {
+            input.removeEventListener('keydown', handleKeyNav);
+            input.addEventListener('keydown', handleKeyNav);
+        });
+    }
+
+    function handleKeyNav(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (this.id === 'circ' || this.id === 'otherTimberInput') {
+                addItem();
+                return;
+            }
+            const inputs = Array.from(document.querySelectorAll('.nav-input'));
+            let nextInput = inputs[inputs.indexOf(this) + 1];
+            if (nextInput) {
+                nextInput.focus();
+            }
+        }
+    }
+
+    function autoSaveDraft() {
+        if (!currentMode) return;
+        let draftData = {
+            time: Date.now(),
+            mode: currentMode,
+            billNo: document.getElementById('billNumberInput').value,
+            custName: document.getElementById('custName').value,
+            billDate: document.getElementById('billDate').value,
+            items: items,
+            nadunRate: document.getElementById('nadunRateInput').value,
+            workersEnabled: document.getElementById('enableWorkersRental').checked,
+            workersCuft: document.getElementById('workersRentalCuft').value,
+            workersRate: document.getElementById('workersRentalRate').value
+        };
+        localStorage.setItem('hasthi_active_draft', JSON.stringify(draftData));
+    }
+
+    function restoreDraft(data) {
+        currentMode = data.mode;
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('historyScreen').style.display = 'none';
+        document.getElementById('appScreen').style.display = 'block';
+
+        if (currentMode === 'Buy') {
+            document.getElementById('screenTitle').innerText = 'Hasthi Furniture - Purchase (Buy)';
+            document.getElementById('nameLabel').innerText = 'Supplier Name:';
+            document.getElementById('workersRentalSection').style.display = 'none';
+            document.getElementById('freeItemCheckboxGroup').style.display = 'none';
+        } else {
+            document.getElementById('screenTitle').innerText = 'Hasthi Furniture - Sales (Sell)';
+            document.getElementById('nameLabel').innerText = 'Customer Name:';
+            document.getElementById('workersRentalSection').style.display = 'block';
+            document.getElementById('freeItemCheckboxGroup').style.display = 'block';
+        }
+
+        document.getElementById('billNumberInput').value = data.billNo || '';
+        document.getElementById('custName').value = data.custName || '';
+        document.getElementById('billDate').value = data.billDate || new Date().toISOString().split('T')[0];
+        items = data.items || [];
+        document.getElementById('nadunRateInput').value = data.nadunRate || '';
+
+        if (currentMode === 'Sell' && data.workersEnabled) {
+            document.getElementById('enableWorkersRental').checked = true;
+            document.getElementById('workersRentalFields').style.display = 'block';
+            document.getElementById('workersRentalCuft').value = data.workersCuft || '';
+            document.getElementById('workersRentalRate').value = data.workersRate || '';
+        }
+
+        renderAll();
+    }
+
+    function cancelDraft() {
+        if (confirm("Are you sure you want to cancel this bill? All entered data will be cleared.")) {
+            localStorage.removeItem('hasthi_active_draft');
+            goHome();
+        }
+    }
+
+    function backToEditFromInvoice() {
+        document.getElementById('invoiceView').style.display = 'none';
+        document.getElementById('appScreen').style.display = 'block';
+    }
+
+    function loadLogoFromGallery(event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let base64Image = e.target.result;
+                document.getElementById('brandLogoImage').src = base64Image;
+                localStorage.setItem('hasthi_logo_img', base64Image);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function selectMode(mode) {
+        currentMode = mode;
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('historyScreen').style.display = 'none';
+        document.getElementById('invoiceView').style.display = 'none';
+        document.getElementById('appScreen').style.display = 'block';
+
+        if (mode === 'Buy') {
+            document.getElementById('screenTitle').innerText = 'Hasthi Furniture - Purchase (Buy)';
+            document.getElementById('nameLabel').innerText = 'Supplier Name:';
+            document.getElementById('billNumberInput').value = 'BL-';
+            document.getElementById('workersRentalSection').style.display = 'none';
+            document.getElementById('freeItemCheckboxGroup').style.display = 'none';
+        } else {
+            document.getElementById('screenTitle').innerText = 'Hasthi Furniture - Sales (Sell)';
+            document.getElementById('nameLabel').innerText = 'Customer Name:';
+            document.getElementById('billNumberInput').value = 'SL-';
+            document.getElementById('workersRentalSection').style.display = 'block';
+            document.getElementById('freeItemCheckboxGroup').style.display = 'block';
+        }
+        autoSaveDraft();
+        setupEnterKeyNavigation();
+    }
+
+    function goHome() {
+        document.getElementById('appScreen').style.display = 'none';
+        document.getElementById('historyScreen').style.display = 'none';
+        document.getElementById('invoiceView').style.display = 'none';
+        document.getElementById('homeScreen').style.display = 'block';
+        items = [];
+        editingIndex = null;
+        document.getElementById('billNumberInput').value = '';
+        document.getElementById('custName').value = '';
+        document.getElementById('timberTypeSelect').selectedIndex = 0;
+        document.getElementById('otherTimberInput').value = '';
+        document.getElementById('otherTimberGroup').style.display = 'none';
+        document.getElementById('nadunRateGroup').style.display = 'none';
+        document.getElementById('nadunRateInput').value = '';
+        document.getElementById('isFreeItem').checked = false;
+        document.getElementById('enableWorkersRental').checked = false;
+        document.getElementById('workersRentalFields').style.display = 'none';
+        document.getElementById('workersRentalCuft').value = '';
+        document.getElementById('workersRentalRate').value = '';
+        resetFormState();
+        let today = new Date().toISOString().split('T')[0];
+        document.getElementById('billDate').value = today;
+        localStorage.removeItem('hasthi_active_draft');
+        renderAll();
+    }
+
+    function toggleWorkersRentalInputs() {
+        let isChecked = document.getElementById('enableWorkersRental').checked;
+        let fieldsDiv = document.getElementById('workersRentalFields');
+        fieldsDiv.style.display = isChecked ? 'block' : 'none';
+
+        if (isChecked) {
+            updateWorkersRentalAutoCuft();
+        }
+        calculateWorkersRentalTotal();
+        autoSaveDraft();
+    }
+
+    function updateWorkersRentalAutoCuft() {
+        let totalDecimal = 0;
+        items.forEach(it => {
+            if (!it.isFree) {
+                totalDecimal += it.decimalVal;
+            }
+        });
+        document.getElementById('workersRentalCuft').value = totalDecimal > 0 ? totalDecimal.toFixed(2) : '';
+        calculateWorkersRentalTotal();
+    }
+
+    function calculateWorkersRentalTotal() {
+        let c = parseFloat(document.getElementById('workersRentalCuft').value) || 0;
+        let r = parseFloat(document.getElementById('workersRentalRate').value) || 0;
+        let tot = c * r;
+        document.getElementById('workersRentalDisplayAmt').innerText = `Workers Rental Total: LKR ${tot.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+
+    function checkTimberOptions() {
+        let selectedVal = document.getElementById('timberTypeSelect').value;
+        let otherGroup = document.getElementById('otherTimberGroup');
+        let nadunRateGroup = document.getElementById('nadunRateGroup');
+
+        if (selectedVal === 'Others') {
+            otherGroup.style.display = 'block';
+            document.getElementById('otherTimberInput').focus();
+        } else {
+            otherGroup.style.display = 'none';
+            document.getElementById('otherTimberInput').value = '';
+        }
+
+        if (selectedVal === 'Nadun Special') {
+            nadunRateGroup.style.display = 'block';
+            document.getElementById('nadunRateInput').focus();
+        } else {
+            nadunRateGroup.style.display = 'none';
+        }
+        setupEnterKeyNavigation();
+    }
+
+    function updateNameDisplay() {
+        let billNo = document.getElementById('billNumberInput').value.trim();
+        let custName = document.getElementById('custName').value;
+        let billDate = document.getElementById('billDate').value;
+        let labelPrefix = currentMode === 'Buy' ? 'Supplier' : 'Customer';
+        
+        let displayNoText = billNo ? `Bill No: ${billNo}` : `Bill No: -`;
+        let displayNameText = custName ? `${labelPrefix}: ${custName}` : '';
+        
+        document.getElementById('billTitleDisplay').innerText = `${displayNoText} | ${displayNameText} | Date: ${billDate}`;
+    }
+
+    const pdfMasterTable = {
+        38: {
+            15: [9, 4, 9] 
+        }
+    };
+
+    function getPDFTableValue(length, circ) {
+        if (pdfMasterTable[circ] && pdfMasterTable[circ][length]) {
+            let entry = pdfMasterTable[circ][length];
+            return {
+                cuft: entry[0],
+                inches: entry[1],
+                pa: entry[2],
+                decimal: entry[0] + (entry[1] / 12) + (entry[2] / 144)
+            };
+        }
+        let exactDecimal = (Math.pow(circ, 2) * length) / 2304;
+        let cuft = Math.floor(exactDecimal);
+        let fractionalPart = exactDecimal - cuft;
+        let inches = Math.floor(fractionalPart * 12);
+        let pa = Math.round(((fractionalPart * 12) - inches) * 12);
+        return { cuft: cuft, inches: inches, pa: pa, decimal: exactDecimal };
+    }
+
+    function addItem() {
+        let selectVal = document.getElementById('timberTypeSelect').value;
+        let type = "";
+
+        if (!selectVal) {
+            alert("Please select a timber type!");
+            document.getElementById('timberTypeSelect').focus();
+            return;
+        }
+
+        if (selectVal === 'Others') {
+            type = document.getElementById('otherTimberInput').value.trim();
+            if (!type) {
+                alert("Please specify the other timber type!");
+                document.getElementById('otherTimberInput').focus();
+                return;
+            }
+        } else {
+            type = selectVal;
+        }
+
+        let length = parseInt(document.getElementById('length').value);
+        let circ = parseInt(document.getElementById('circ').value);
+
+        if (!length || !circ || length <= 0 || circ <= 0) {
+            alert("Please enter valid length and circumference!");
+            return;
+        }
+
+        let isFree = currentMode === 'Sell' ? document.getElementById('isFreeItem').checked : false;
+
+        let category = "";
+        let isSpecialNadun = false;
+
+        let pdfResult = getPDFTableValue(length, circ);
+        let cuftPart = pdfResult.cuft;
+        let inchPart = pdfResult.inches;
+        let paPart = pdfResult.pa;
+        let totalCuFtDecimal = pdfResult.decimal;
+
+        if (type === "Nadun Special") {
+            if (circ >= 18 && circ <= 35) {
+                category = '18" - 35" (Nadun Special Formula)';
+                isSpecialNadun = true;
+            } else {
+                isSpecialNadun = false;
+                if (circ < 18) category = '< 18" (Under 18 inches)';
+                else if (circ <= 47) category = '36" - 47"';
+                else if (circ <= 59) category = '48" - 59"';
+                else category = '> 60" (Over 60 inches)';
+            }
+        } else {
+            if (circ < 24) category = '< 24" (Under 24 inches)';
+            else if (circ <= 29) category = '24" - 29"';
+            else if (circ <= 35) category = '30" - 35"';
+            else if (circ <= 47) category = '36" - 47"';
+            else if (circ <= 59) category = '48" - 59"';
+            else category = '> 60" (Over 60 inches)';
+        }
+
+        let displayStr = `${cuftPart} cu.ft ${inchPart} ins ${paPart} pa`;
+
+        let newItemData = {
+            type: type,
+            length: length,
+            circ: circ,
+            category: category,
+            isSpecial: isSpecialNadun,
+            cuft: cuftPart,
+            inches: inchPart,
+            pa: paPart,
+            decimalVal: totalCuFtDecimal,
+            displayStr: displayStr,
+            rate: 0,
+            isFree: isFree
+        };
+
+        if (editingIndex !== null) {
+            newItemData.rate = items[editingIndex].rate;
+            items[editingIndex] = newItemData;
+            editingIndex = null;
+            resetFormState();
+        } else {
+            items.push(newItemData);
+        }
+
+        if (currentMode === 'Sell' && document.getElementById('enableWorkersRental').checked) {
+            updateWorkersRentalAutoCuft();
+        }
+
+        renderAll();
+        autoSaveDraft();
+        
+        document.getElementById('length').value = '';
+        document.getElementById('circ').value = '';
+        if (currentMode === 'Sell') {
+            document.getElementById('isFreeItem').checked = false;
+        }
+        document.getElementById('length').focus();
+    }
+
+    function editItem(index) {
+        let item = items[index];
+        editingIndex = index;
+
+        let selectEl = document.getElementById('timberTypeSelect');
+        let options = Array.from(selectEl.options).map(o => o.value);
+
+        if (options.includes(item.type)) {
+            selectEl.value = item.type;
+            document.getElementById('otherTimberGroup').style.display = 'none';
+        } else {
+            selectEl.value = 'Others';
+            document.getElementById('otherTimberGroup').style.display = 'block';
+            document.getElementById('otherTimberInput').value = item.type;
+        }
+
+        checkTimberOptions();
+
+        document.getElementById('length').value = item.length;
+        document.getElementById('circ').value = item.circ;
+        if (currentMode === 'Sell') {
+            document.getElementById('isFreeItem').checked = !!item.isFree;
+        }
+
+        let btn = document.getElementById('actionBtn');
+        btn.innerText = "Update Item";
+        btn.style.backgroundColor = "#d97706";
+
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function resetFormState() {
+        editingIndex = null;
+        let btn = document.getElementById('actionBtn');
+        btn.innerText = "Add Item to List";
+        btn.style.backgroundColor = "#16a34a";
+        if (currentMode === 'Sell') {
+            document.getElementById('isFreeItem').checked = false;
+        }
+    }
+
+    function deleteItem(index) {
+        if (editingIndex === index) {
+            resetFormState();
+            document.getElementById('length').value = '';
+            document.getElementById('circ').value = '';
+        }
+        items.splice(index, 1);
+        if (editingIndex !== null && index < editingIndex) {
+            editingIndex--;
+        }
+        if (currentMode === 'Sell' && document.getElementById('enableWorkersRental').checked) {
+            updateWorkersRentalAutoCuft();
+        }
+        renderAll();
+        autoSaveDraft();
+    }
+
+    function renderAll() {
+        updateNameDisplay();
+
+        let nadunRate = parseFloat(document.getElementById('nadunRateInput').value) || 0;
+        let tbody = document.getElementById('billTable').querySelector('tbody');
+        tbody.innerHTML = '';
+
+        items.forEach((item, index) => {
+            let rowDisplayStr = item.displayStr;
+            let freeBadge = item.isFree ? `<br><span style="background: #16a34a; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">FREE ITEM</span>` : '';
+            
+            if (item.isSpecial) {
+                let itemAmt = item.isFree ? 0 : (item.circ * (item.decimalVal * 12) * nadunRate) / 12;
+                let exactCuFtText = item.decimalVal.toFixed(2);
+                rowDisplayStr = `${item.displayStr} ${freeBadge}<br><small style="color: #0284c7; font-weight: bold;">Cu.Ft: ${exactCuFtText}</small><br><small style="color: #d97706; font-weight: bold;">LKR ${itemAmt.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small>`;
+            } else {
+                rowDisplayStr = `${item.displayStr} ${freeBadge}`;
+            }
+
+            let row = `<tr>
+                <td>${item.type}</td>
+                <td>${item.length}' x ${item.circ}"</td>
+                <td>${item.category}</td>
+                <td>${rowDisplayStr}</td>
+                <td>
+                    <button class="edit-btn" onclick="editItem(${index})">Edit</button>
+                    <button class="delete-btn" onclick="deleteItem(${index})">X</button>
+                </td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+
+        // Group regular (paid) items for summary
+        let groupMap = {};
+        items.forEach(item => {
+            if (item.isFree) return; // Free items handled separately or ignored in paid pricing
+            let groupKey = item.type + "___" + item.category;
+            if (!groupMap[groupKey]) {
+                groupMap[groupKey] = { timberType: item.type, category: item.category, itemsList: [], rate: item.rate, isSpecial: item.isSpecial };
+            }
+            groupMap[groupKey].itemsList.push(item);
+            groupMap[groupKey].rate = item.rate;
+        });
+
+        let summarySection = document.getElementById('categorySummarySection');
+        let summaryCardsDiv = document.getElementById('categorySummaryCards');
+        summaryCardsDiv.innerHTML = '';
+
+        let groupKeys = Object.keys(groupMap);
+        if (groupKeys.length > 0 || items.some(it => it.isFree)) {
+            groupKeys.sort((a, b) => {
+                let partsA = a.split('___');
+                let partsB = b.split('___');
+                if (partsA[0] !== partsB[0]) {
+                    return partsA[0].localeCompare(partsB[0]);
+                }
+                return getCategoryRank(partsA[1]) - getCategoryRank(partsB[1]);
+            });
+
+            summarySection.style.display = 'block';
+            groupKeys.forEach(key => {
+                let gData = groupMap[key];
+                let timberName = gData.timberType;
+                let categoryName = gData.category;
+                let safeId = (timberName + "_" + categoryName).replace(/[^a-zA-Z0-9]/g, '_');
+
+                if (gData.isSpecial) {
+                    let totalCcuft = 0, totalCinches = 0, nadunTotalAmt = 0;
+                    gData.itemsList.forEach(it => {
+                        let itemAmt = (it.circ * (it.decimalVal * 12) * nadunRate) / 12;
+                        totalCcuft += it.cuft;
+                        totalCinches += it.inches;
+                        nadunTotalAmt += itemAmt;
+                    });
+                    let extraCuft = Math.floor(totalCinches / 12);
+                    let finalInches = totalCinches % 12;
+                    let finalCuft = totalCcuft + extraCuft;
+
+                    summaryCardsDiv.innerHTML += `
+                        <div class="category-summary-card" style="border-left: 4px solid #d97706; background: #fffdf4;">
+                            <div style="font-weight: bold; color: #1e293b; margin-bottom: 2px; font-size: 13px;">Timber: ${timberName}</div>
+                            <div style="font-size: 12px; color: #334155; margin-bottom: 3px;">Category: ${categoryName}</div>
+                            <div style="font-size: 12px; color: #475569; margin-bottom: 5px;">Total Quantity: <strong>${finalCuft} cu.ft ${finalInches} ins</strong></div>
+                            <div style="background: #fef3c7; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 12px; color: #92400e; font-weight: bold;">Nadun Special Total:</span>
+                                <span style="font-size: 13px; color: #b45309; font-weight: bold;" id="cat-amt-${safeId}">LKR ${nadunTotalAmt.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            </div>
+                        </div>`;
+                } else {
+                    let currentRate = gData.rate === 0 ? '' : gData.rate;
+                    let cCuft = 0, cInches = 0;
+                    gData.itemsList.forEach(it => {
+                        cCuft += it.cuft;
+                        cInches += it.inches;
+                    });
+                    let extraCuft = Math.floor(cInches / 12);
+                    let finalInches = cInches % 12;
+                    let finalCuft = cCuft + extraCuft;
+                    let totalCatDecimal = finalCuft + (finalInches / 12);
+                    let catAmount = totalCatDecimal * gData.rate;
+
+                    let cardDiv = document.createElement('div');
+                    cardDiv.className = 'category-summary-card';
+                    cardDiv.innerHTML = `
+                        <div style="font-weight: bold; color: #1e293b; margin-bottom: 2px; font-size: 13px;">Timber: ${timberName}</div>
+                        <div style="font-size: 12px; color: #334155; margin-bottom: 3px;">Category: ${categoryName}</div>
+                        <div style="font-size: 12px; color: #475569; margin-bottom: 5px;">Total Quantity: <strong>${finalCuft} cu.ft ${finalInches} ins</strong></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 12px; font-weight: bold;">Rate (LKR):</span>
+                            <input type="number" class="rate-input nav-input" placeholder="Enter rate" value="${currentRate}" style="width: 55%; padding: 5px; font-size: 13px;">
+                        </div>
+                        <div style="background: #f1f5f9; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px; color: #334155; font-weight: bold;">Set Total:</span>
+                            <span style="font-size: 13px; color: #0d9488; font-weight: bold;" id="cat-amt-${safeId}">LKR ${catAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </div>`;
+                    
+                    let rateInput = cardDiv.querySelector('.rate-input');
+                    rateInput.addEventListener('input', function() {
+                        let val = parseFloat(this.value) || 0;
+                        gData.itemsList.forEach(it => {
+                            it.rate = val;
+                        });
+                        let calcAmt = totalCatDecimal * val;
+                        document.getElementById(`cat-amt-${safeId}`).innerText = `LKR ${calcAmt.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        autoSaveDraft();
+                    });
+
+                    summaryCardsDiv.appendChild(cardDiv);
+                }
+            });
+        } else {
+            summarySection.style.display = 'none';
+        }
+
+        setupEnterKeyNavigation();
+    }
+
+    function finishBill() {
+        let billNo = document.getElementById('billNumberInput').value.trim();
+        let custName = document.getElementById('custName').value.trim();
+        let billDate = document.getElementById('billDate').value;
+
+        if (!billNo) {
+            alert("Please enter a bill number!");
+            document.getElementById('billNumberInput').focus();
+            return;
+        }
+
+        if (!custName) {
+            alert("Please enter a name!");
+            document.getElementById('custName').focus();
+            return;
+        }
+
+        if (items.length === 0) {
+            alert("No items added to the bill!");
+            return;
+        }
+
+        let workersData = null;
+        if (currentMode === 'Sell' && document.getElementById('enableWorkersRental').checked) {
+            workersData = {
+                cuft: parseFloat(document.getElementById('workersRentalCuft').value) || 0,
+                rate: parseFloat(document.getElementById('workersRentalRate').value) || 0,
+                total: (parseFloat(document.getElementById('workersRentalCuft').value) || 0) * (parseFloat(document.getElementById('workersRentalRate').value) || 0)
+            };
+        }
+
+        let billData = {
+            id: Date.now(),
+            billNo: billNo,
+            mode: currentMode,
+            name: custName,
+            date: billDate,
+            items: items,
+            nadunRate: document.getElementById('nadunRateInput').value,
+            workersRental: workersData
+        };
+
+        let savedBills = JSON.parse(localStorage.getItem('hasthi_saved_bills')) || [];
+        savedBills.push(billData);
+        localStorage.setItem('hasthi_saved_bills', JSON.stringify(savedBills));
+        localStorage.removeItem('hasthi_active_draft');
+
+        showInvoiceView(billData);
+    }
+
+    function showInvoiceView(billData) {
+        document.getElementById('appScreen').style.display = 'none';
+        document.getElementById('invoiceView').style.display = 'block';
+
+        let labelPrefix = billData.mode === 'Buy' ? 'Supplier' : 'Customer';
+        document.getElementById('invoiceHeaderInfo').innerHTML = `<strong>Bill No:</strong> ${billData.billNo} | <strong>${labelPrefix}:</strong> ${billData.name} | <strong>Date:</strong> ${billData.date}`;
+
+        let nadunRate = parseFloat(billData.nadunRate) || 0;
+        let groupMap = {};
+        let freeItemsList = [];
+        let totalFreeDecimal = 0;
+
+        billData.items.forEach(item => {
+            if (item.isFree) {
+                freeItemsList.push(item);
+                totalFreeDecimal += item.decimalVal;
+                return;
+            }
+            let gKey = item.type + "___" + item.category;
+            if(!groupMap[gKey]) {
+                groupMap[gKey] = { timberType: item.type, category: item.category, itemsList: [], rate: item.rate, isSpecial: item.isSpecial };
+            }
+            groupMap[gKey].itemsList.push(item);
+            groupMap[gKey].rate = item.rate;
+        });
+
+        // Render Paid Table
+        let invoiceTbody = document.getElementById('invoiceTableBody');
+        invoiceTbody.innerHTML = '';
+
+        let grandTotalCuftDecimal = 0;
+        let grandTotalPrice = 0;
+
+        let groupKeys = Object.keys(groupMap);
+        groupKeys.sort((a, b) => {
+            let partsA = a.split('___');
+            let partsB = b.split('___');
+            if (partsA[0] !== partsB[0]) {
+                return partsA[0].localeCompare(partsB[0]);
+            }
+            return getCategoryRank(partsA[1]) - getCategoryRank(partsB[1]);
+        });
+
+        groupKeys.forEach(gKey => {
+            let g = groupMap[gKey];
+            let cCuft = 0, cInches = 0, catAmount = 0;
+
+            if (g.isSpecial) {
+                g.itemsList.forEach(it => {
+                    catAmount += (it.circ * (it.decimalVal * 12) * nadunRate) / 12;
+                    cCuft += it.cuft;
+                    cInches += it.inches;
+                    grandTotalCuftDecimal += it.decimalVal;
+                });
+            } else {
+                g.itemsList.forEach(it => {
+                    cCuft += it.cuft;
+                    cInches += it.inches;
+                });
+                let extraCuft = Math.floor(cInches / 12);
+                let finalInches = cInches % 12;
+                let finalCuft = cCuft + extraCuft;
+                let catDecimal = finalCuft + (finalInches / 12);
+                catAmount = catDecimal * g.rate;
+                grandTotalCuftDecimal += catDecimal;
+            }
+
+            grandTotalPrice += catAmount;
+
+            let extraCuFtTotRow = Math.floor(cInches / 12);
+            let finalInchesTotRow = cInches % 12;
+            let finalCuftTotRow = cCuft + extraCuFtTotRow;
+            let totalCuFtStr = `${finalCuftTotRow} cu.ft ${finalInchesTotRow} ins`;
+            let displayRate = g.isSpecial ? `Nadun Special Rate` : `LKR ${g.rate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            invoiceTbody.innerHTML += `
+                <tr>
+                    <td style="text-align: left; padding: 6px;">${g.timberType} (${g.category})</td>
+                    <td>${totalCuFtStr}</td>
+                    <td>${displayRate}</td>
+                    <td>LKR ${catAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                </tr>
+            `;
+        });
+
+        let totalCuftFloor = Math.floor(grandTotalCuftDecimal);
+        let totalCuftFraction = grandTotalCuftDecimal - totalCuftFloor;
+        let totalInchesTotal = Math.round(totalCuftFraction * 12);
+        if(totalInchesTotal >= 12) {
+            totalCuftFloor += 1;
+            totalInchesTotal = 0;
+        }
+        let grandTotalCuftStr = `${totalCuftFloor} cu.ft ${totalInchesTotal} ins`;
+
+        invoiceTbody.innerHTML += `
+            <tr style="background-color: #f8fafc; font-weight: bold;">
+                <td style="text-align: left; padding: 8px;">Total (Paid)</td>
+                <td>${grandTotalCuftStr}</td>
+                <td>-</td>
+                <td style="color: #0d9488;">LKR ${grandTotalPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            </tr>
+        `;
+
+        // Render Free Items Section in Invoice
+        let freeContainer = document.getElementById('invoiceFreeItemsContainer');
+        let freeListDiv = document.getElementById('invoiceFreeItemsList');
+        let freeCuftDisplay = document.getElementById('invoiceTotalFreeCuftDisplay');
+
+        if (freeItemsList.length > 0) {
+            freeContainer.style.display = 'block';
+            let freeHtml = '';
+            freeItemsList.forEach(fi => {
+                freeHtml += `• ${fi.type} - Size: ${fi.length}' x ${fi.circ}" (${fi.displayStr})<br>`;
+            });
+            freeListDiv.innerHTML = freeHtml;
+
+            let freeFloor = Math.floor(totalFreeDecimal);
+            let freeFrac = totalFreeDecimal - freeFloor;
+            let freeIns = Math.round(freeFrac * 12);
+            if (freeIns >= 12) {
+                freeFloor += 1;
+                freeIns = 0;
+            }
+            freeCuftDisplay.innerText = `Total Free Given Cubic Feet: ${freeFloor} cu.ft ${freeIns} ins (${totalFreeDecimal.toFixed(2)} Cu.Ft)`;
+        } else {
+            freeContainer.style.display = 'none';
+        }
+
+        // Render Workers Rental Section in Invoice
+        let invoiceWorkersContainer = document.getElementById('invoiceWorkersContainer');
+        let invoiceWorkersTableBody = document.getElementById('invoiceWorkersTableBody');
+        invoiceWorkersTableBody.innerHTML = '';
+
+        if (billData.workersRental) {
+            invoiceWorkersContainer.style.display = 'block';
+            let workersTotalAmount = billData.workersRental.total;
+            invoiceWorkersTableBody.innerHTML = `
+                <tr>
+                    <td style="text-align: left; padding: 6px;">Workers Rental</td>
+                    <td>${billData.workersRental.cuft} cu.ft</td>
+                    <td>LKR ${billData.workersRental.rate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td>LKR ${workersTotalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                </tr>
+            `;
+        } else {
+            invoiceWorkersContainer.style.display = 'none';
+        }
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        let element = document.getElementById('billContainer');
+        
+        html2canvas(element, { scale: 2 }).then(canvas => {
+            let imgData = canvas.toDataURL('image/png');
+            let pdf = new jsPDF('p', 'mm', 'a4');
+            let imgWidth = 210;
+            let pageHeight = 295;
+            let imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            let billNo = document.getElementById('billNumberInput').value.trim() || 'Invoice';
+            pdf.save(`Hasthi_Bill_${billNo}.pdf`);
+            alert("Bill successfully downloaded as PDF!");
+        });
+    }
+
+    function openHistory() {
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('historyScreen').style.display = 'block';
+        
+        let container = document.getElementById('historyListContainer');
+        container.innerHTML = '';
+        let savedBills = JSON.parse(localStorage.getItem('hasthi_saved_bills')) || [];
+
+        if (savedBills.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #666;">No saved bills found.</p>';
+            return;
+        }
+
+        savedBills.reverse().forEach((bill) => {
+            let modeText = bill.mode === 'Buy' ? 'Purchase (Buy)' : 'Sales (Sell)';
+            let bNo = bill.billNo ? bill.billNo : 'N/A';
+            let card = document.createElement('div');
+            card.className = 'history-card';
+            card.innerHTML = `
+                <div>
+                    <strong>${bNo} - ${bill.name}</strong> (${modeText})<br>
+                    <small style="color: #666;">Date: ${bill.date}</small>
+                </div>
+                <div>
+                    <button class="delete-btn" onclick="deleteSavedBill(${bill.id})">Delete</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function deleteSavedBill(id) {
+        if (confirm("Are you sure you want to delete this saved bill?")) {
+            let savedBills = JSON.parse(localStorage.getItem('hasthi_saved_bills')) || [];
+            savedBills = savedBills.filter(b => b.id != id);
+            localStorage.setItem('hasthi_saved_bills', JSON.stringify(savedBills));
+            openHistory();
+        }
+    }
+
+    function printBill() {
+        window.print();
+    }
+</script>
+
+</body>
+</html>
